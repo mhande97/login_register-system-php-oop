@@ -28,6 +28,7 @@ spl_autoload_register(function($class){
 });
 
 require "functions/Sanitize.php";
+require "partition/header.php";
 
 
 
