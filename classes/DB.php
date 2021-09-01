@@ -72,12 +72,13 @@ class DB {
                     $this->_count = $this->_query->rowCount();
 
                 else:
+                    
                     $this->_error = true;
                 endif;
             else:
-
+                
             endif;
-
+           
            return $this;
 
             
@@ -117,6 +118,12 @@ class DB {
           endif;
           
         }
+        
+        public function first() {
+            $data = $this->Result();
+            return $data[0];
+        }
+    
         /**
          * Insert method v0.1
          * insert data on the database
@@ -128,7 +135,7 @@ class DB {
         {
             if (count($fields)):
 
-
+                // forming the sql query string
                 $keys = array_keys($fields);
                  
                 $columns = "`" . implode("`,`",$keys) . "`";
@@ -145,7 +152,7 @@ class DB {
                if (!$this->Query($sql,$fields)->_error):
                    return $this;
                endif;
-               
+           
                endif;
                return false;
         }

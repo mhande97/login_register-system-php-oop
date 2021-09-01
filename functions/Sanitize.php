@@ -1,6 +1,6 @@
 <?php
 
-function escape($string,$type)
+function escape($string,$type = 'string')
 {
 
     switch ($type) {
@@ -8,10 +8,12 @@ function escape($string,$type)
         case 'text':
             return filter_var($string,FILTER_SANITIZE_STRING);
             break;
+
         case 'number':
         case 'integer':
             return filter_var($string,FILTER_SANITIZE_NUMBER_INT);
             break;
+            
         case 'email':
             return filter_var($string,FILTER_SANITIZE_EMAIL);
             break;
