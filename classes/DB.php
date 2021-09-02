@@ -85,39 +85,38 @@ class DB {
         }
 
         /**
-         * public Get method v0.1
+         * public Get method v0.2
          * method that Form the Get Query
          * Accept Parameters
-         * $colums = "*",
-         * $table,
-         * $join=NULL,
-         * $where = NULL,
-         * $and=NULL,
-         * $or=NULL,
-         * $ordFieled,
-         * $ordering="ASC",
+         * @array(
+         *    $colums = "*",
+         *    $table,
+         *    $join=NULL,
+         *    $where = NULL,
+         *    $and=NULL,
+         *    $or=NULL,
+         *    $ordFieled,
+         *    $ordering="ASC",
+         * )
          * $params = array()
          */
-        public function Get(
-                            $selected_fieled = "*",
-                            $table,
-                            $join=NULL,
-                            $where = NULL,
-                            $and=NULL,
-                            $or=NULL,
-                            $ordFieled,
-                            $ordering="ASC",
-                            $params = array()
-                            )
-        {
-         
-            $sql = "SELECT $selected_fieled FROM $table $join $where $and $or ORDER BY $ordFieled $ordering";
+        public function Get($queryPart = array(),$params = array())
+            {
 
-          if (!$this->Query($sql,$params)->_error):
-            return $this;
-          endif;
-          
-        }
+            $sql = "SELECT 
+                    {$queryPart['columns']} 
+                    FROM {$queryPart['table']} 
+                    {$queryPart['join']} 
+                    {$queryPart['where']} 
+                    {$queryPart['and']} 
+                    {$queryPart['or']} 
+                    ORDER BY {$queryPart['orderfield']} {$queryPart['ordering']}";
+            
+            if (!$this->Query($sql,$params)->_error):
+               return $this;
+            endif;
+
+            }
         
         public function first() {
             $data = $this->Result();
@@ -150,7 +149,7 @@ class DB {
                $sql = "INSERT INTO $table($columns) VALUES ($Que_mark)";
 
                if (!$this->Query($sql,$fields)->_error):
-                   return $this;
+                   return true;
                endif;
            
                endif;
@@ -186,9 +185,9 @@ class DB {
                
                  $fields = array_merge($fields,$where);
                  
-
+                 
                 if (!$this->Query($sql,$fields)->_error):
-                    return $this;
+                    return true;
                 endif;
                
             endif;

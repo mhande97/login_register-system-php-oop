@@ -17,21 +17,17 @@ class User{
      {
         $this->_db = DB::getInstace();
         $this->_sessionName = Config::get('session/session_name');
-        $this->_cookieName = Config::get('remember/cookie_name');
+      //   $this->_cookieName = Config::get('remember/cookie_name');
+  
+      if (!$user):
 
-        if(!$user) {
-         if(Session::exists($this->_sessionName)) {
-             $user = Session::get($this->_sessionName);
-
-             if($this->find($user)) {
-                 $this->isLoggedIn = true;
-             } else {
-                 //Logout
-             }
-         }
-     } else {
-         $this->find($user);
-     }
+         if (Session::exists($this->_sessionName)):
+            $user = Session::get($this->_sessionName);
+            $this->isLoggedIn = ($this->find($user))? true : false;
+         endif;
+      else:
+           $this->isLoggedIn = ($this->find($user))? true : false;
+      endif;
      }
 
 
@@ -44,8 +40,22 @@ class User{
 
     public function find($user)
     {
-      $field = (is_numeric($user)) ? 'id' : 'username';
-      $get = $this->_db->Get("*","users","","WHERE $field = ?","","","userID","ASC",array($user));
+      $field = (is_numeric($user)) ? 'userID' : 'username';
+
+     
+       $get = $this->_db->Get(array(
+            'columns'=>'*',
+            'table'=>'users',
+            'join'=>'',
+            'where'=>"WHERE {$field} = ? ",
+            'and'=>'',
+            'or'=>'',
+            'orderfield'=>'userID',
+            'ordering'=>'ASC',
+        ),array($user)); 
+      
+      
+   
       if ($get->Count()):
          $this->_data = $get->first();
          return true;
@@ -63,20 +73,20 @@ class User{
                   
                   Session::put($this->_sessionName,$this->data()->userID);
 
-                 if ($remember):
-                   $hash = Hash::unique();
-                   $checkHash = $this->_db->get('*','users_session','','WHERE user_id = ?','','','id','ASC',array($this->data()->userID)); 
+               //   if ($remember):
+               //     $hash = Hash::unique();
+               //     $checkHash = $this->_db->get('*','users_session','','WHERE user_id = ?','','','id','ASC',array($this->data()->userID)); 
 
-                   if (!$checkHash->Count()):
-                      $this->_db->Insert('users_session',array(
-                         'user_id'=>$this->data()->userID,
-                         'hash'=>$hash,
-                      ));
-                   else:
-                     $hash = $checkHash->first()->hash;
-                   endif;
-                   Cookie::put($this->_cookieName,$hash,Config::get('remember/cookie_expiry'));
-                 endif;
+               //     if (!$checkHash->Count()):
+               //        $this->_db->Insert('users_session',array(
+               //           'user_id'=>$this->data()->userID,
+               //           'hash'=>$hash,
+               //        ));
+               //     else:
+               //       $hash = $checkHash->first()->hash;
+               //     endif;
+               //    //  Cookie::put($this->_cookieName,$hash,Config::get('remember/cookie_expiry'));
+               //   endif;
 
                   return true;
 
@@ -86,13 +96,23 @@ class User{
              
           return false;
     }
-   
+    public function update($field = array(),$id = null)
+    {
+       $id = $this->data()->userID;
+      
+       if (!$this->_db->update('users',$field,array('userID'=>$id))):
+         throw new Exception('there is a problem in updating !');
+       endif;
+    }
+
+
+
     public function Logout()
     {
 
-      $this->_db->delete('users_session','user_id = ?',array(Session::get($this->_sessionName)));
+      // $this->_db->delete('users_session','user_id = ?',array(Session::get($this->_sessionName)));
       Session::delete($this->_sessionName);
-      Cookie::delete($this->_cookieName);
+      // Cookie::delete($this->_cookieName);
 
     }
     public function data()

@@ -49,7 +49,7 @@ if (Input::exists()) :
                
                 $user->Create($user_data);
 
-                // Session::flash('login', 'You registred succesfully !');
+                Session::flash('login', 'You registred succesfully !');
                 Redirect::to("login.php");
                
 

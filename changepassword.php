@@ -33,6 +33,15 @@ if (Input::exists()):
        $validation = new Validation();
        if ($validation->check($_POST,$rules)->passed()):
         $user = new user();
+        try {
+            $user->update(array(
+                'password'=>password_hash(Input::get('newPass'),PASSWORD_DEFAULT),
+            ));
+            Session::flash('home','your password is updated succesfully');
+            Redirect::to('dash.php');
+        } catch (Exception $e) {
+            die($e->getMessage() . $e->getLine() . $e->getFile());
+        }
            
        else:
         $err = $validation->errors();

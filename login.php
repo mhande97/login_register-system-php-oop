@@ -2,15 +2,7 @@
 require "core/init.php";
 
 
-
-
-// if (Session::exists('login')):
-//      echo Session::flash('login');
-// endif;
-
 if (Input::exists()):
-    
-    
     if (Token::check(Input::get('token'))):
 
        $rules = array(
@@ -27,9 +19,10 @@ if (Input::exists()):
        if ($validation->check($_POST,$rules)->passed()):
 
            $user = new User();
-           $remember = (Input::get('remember') === 'on') ? true : false ;
+          
+        // $remember = (Input::get('remember') === 'on') ? true : false ;
 
-           if ($user->login(Input::get('username'),Input::get('password'),$remember)):
+           if ($user->login(Input::get('username'),Input::get('password'))):
 
             $username = escape(Input::get('username'));
 
@@ -48,7 +41,9 @@ endif;
 
 ?>
 
-
+<?php if (Session::exists('login')):?>
+    <div class="alert alert-success"> <?php echo Session::flash('login')?> </div>
+<?php endif;?>
 
 
 <div class="container py-3">
@@ -66,12 +61,12 @@ endif;
             <?php if (isset($err['password'])) : ?> <div class="text-danger py-1"><?php echo $err['password'] ?></div> <?php endif; ?>
         </div>
 
-        <div class="form-check mb-3">
+        <!-- <div class="form-check mb-3">
           <input class="form-check-input" type="checkbox" name="remember" value="on" id="remember">
           <label class="form-check-label" for="remember">
           Remember Me?
          </label>
-       </div>
+       </div> -->
 
 
         <input type="hidden" name="token" value="<?php echo Token::generate() ?>">
